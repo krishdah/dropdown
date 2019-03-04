@@ -201,6 +201,16 @@ button:focus + .remove-icon {
   font-size: 1.2em;
 }
 
+.searched-items-active {
+  display: flex;
+  justify-content: space-between;
+  color: deepskyblue;
+  font-size: 1.2em;
+  background: #e8f0fe;
+  padding: 10px 0px;
+  border-radius: 10px;
+}
+
 .searched-block {
   margin: 10px;
 }

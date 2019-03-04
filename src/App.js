@@ -14,13 +14,13 @@ class App extends PureComponent {
   input = React.createRef();
   ul = React.createRef();
   subLi = React.createRef();
+  searchBlock = React.createRef();
 
   componentDidMount() {
     this.props.cloneAllItems();
   }
 
   showListHandler = () => {
-    console.log("fired this");
     let element = this.input.current;
     element.focus();
     if (!this.state.showList) {
@@ -52,9 +52,16 @@ class App extends PureComponent {
               input={this.input}
               ul={this.ul}
               subLi={this.subLi}
+              searchBlock={this.searchBlock}
               showListHandler={this.showListHandler}
             />
-            {this.state.showList && <Lists ul={this.ul} input={this.input} />}
+            {this.state.showList && (
+              <Lists
+                ul={this.ul}
+                input={this.input}
+                searchBlock={this.searchBlock}
+              />
+            )}
           </div>
 
           {this.props.showSubLists && (
@@ -82,8 +89,6 @@ const mapDispatchToProps = dispatch => {
   return {
     cloneAllItems: () => dispatch({ type: "CLONE" }),
     hideList: () => dispatch({ type: "HIDE_LISTS" })
-    // updateHighLight: () =>
-    //   dispatch({ type: "UPDATE_ACTIVE", highlightedValue: "" })
   };
 };
 

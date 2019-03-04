@@ -36,16 +36,24 @@ class Lists extends PureComponent {
   };
 
   getLists = lists => {
+    let highlightedCategory = this.props.highlightedCategory;
     return lists.map(item => {
       let key = Object.keys(item)[0];
       let arr = Object.values(item)[0];
+      console.log(highlightedCategory, key, "rendering");
       return (
         <div
           className="searched-block"
           onClick={e => this.onClickSearch(e, key)}
         >
-          <div className="searched-items">
-            <span>{key} </span>
+          <div
+            className={
+              highlightedCategory === key
+                ? "searched-items-active"
+                : "searched-items"
+            }
+          >
+            <LiHighLight item={key} searchInput={this.props.searchInput} />
             <div
               className="expand-category"
               data-value="showSubLists"
@@ -76,9 +84,14 @@ class Lists extends PureComponent {
 
   render() {
     let lists = this.props.filteredItems;
+    console.log(lists, "lists");
     if (lists.length && typeof lists[0] === "object") {
       let listToRender = this.getLists(lists);
-      return <div className="list-container">{listToRender} </div>;
+      return (
+        <div className="list-container" ref={this.props.searchBlock}>
+          {listToRender}{" "}
+        </div>
+      );
     } else {
       return (
         <div>
@@ -94,20 +107,6 @@ class Lists extends PureComponent {
     }
   }
 }
-
-//     return (
-//       <div>
-//         <ul
-//           className="item-lists"
-//           ref={this.props.ul}
-//           onClick={this.onClickHandler}
-//         >
-//           <RenderLi />
-//         </ul>
-//       </div>
-//     );
-//   }
-// }
 const mapStateToProps = state => {
   return {
     highlightedCategory: state.highlightedCategory,

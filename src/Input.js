@@ -11,46 +11,13 @@ class Input extends PureComponent {
       arr.filter(itm => {
         itm.toLowerCase().indexOf(searchInputValue) > -1 && subArr.push(itm);
       });
-      subArr.length && newArr.push({ [value]: subArr });
-      // subArr.length && newArr.push({ [value]: subArr.concat(value) });
-      // if (tr[0] !== undefined) {
-      //   newArr.push(tr[0], Object.keys(item)[0]);
-      //   console.log(newArr);
-      // }
-
-      // if (tr.length) {
-      //   return item;
-      // } else {
-      //   item = value.toLowerCase();
-      //   return item.indexOf(searchInputValue) > -1;
-      // }
+      let checkKey = value.toLowerCase().indexOf(searchInputValue) > -1;
+      subArr.length
+        ? newArr.push({ [value]: subArr })
+        : checkKey && newArr.push({ [value]: subArr });
     });
     return newArr;
   };
-  // getFilteredItems = searchInputValue => {
-  //   let newArr = [];
-  //   return this.props.allItems.filter(item => {
-  //     let value = Object.keys(item)[0];
-  //     let arr = item[value];
-  //     let subArr = []
-  //     let tr = arr.filter(itm => {
-  //       itm = itm.toLowerCase();
-  //       console.log(itm.indexOf(searchInputValue));
-  //       return itm.indexOf(searchInputValue) > -1;
-  //     });
-  //     if (tr[0] !== undefined) {
-  //       newArr.push(tr[0], Object.keys(item)[0]);
-  //       console.log(newArr);
-  //     }
-
-  //     if (tr.length) {
-  //       return item;
-  //     } else {
-  //       item = value.toLowerCase();
-  //       return item.indexOf(searchInputValue) > -1;
-  //     }
-  //   });
-  // };
 
   onChangeHandler = event => {
     let searchInputValue = event.target.value.toLowerCase();
@@ -61,11 +28,6 @@ class Input extends PureComponent {
       let filteredItems = this.getFilteredItems(searchInputValue);
       this.props.searchItems(searchInputValue, filteredItems);
     }
-
-    // let keys = [];
-    // for (let i in filteredItems) {
-    //   keys[i] = Object.keys(filteredItems[i])[0];
-    // }
   };
 
   updateViewOnScroll = itemIndex => {
@@ -76,41 +38,47 @@ class Input extends PureComponent {
       ? subLists[itemIndex]
       : filteredItems[itemIndex];
     console.log(highlightedValue);
-    this.props.updateHighlightedValue(highlightedValue);
-    let listOfDropDownItems = showSubLists
-      ? this.props.subLi.current
-      : this.props.ul.current;
-    if (listOfDropDownItems != null) {
-      listOfDropDownItems.querySelectorAll("li")[itemIndex].scrollIntoView({
+    if (this.props.searchInput !== "") {
+      this.props.updateHighlightedValue(highlightedValue);
+      let scroll = this.props.searchBlock.current;
+      scroll.querySelectorAll(".searched-block")[itemIndex].scrollIntoView({
         block: "nearest",
         behavior: "instant"
       });
+    } else {
+      this.props.updateHighlightedValue(highlightedValue);
+      let listOfDropDownItems = showSubLists
+        ? this.props.subLi.current
+        : this.props.ul.current;
+      if (listOfDropDownItems != null) {
+        listOfDropDownItems.querySelectorAll("li")[itemIndex].scrollIntoView({
+          block: "nearest",
+          behavior: "instant"
+        });
+      }
     }
   };
 
-  // getNewSelectedItemList = selectedValue => {
-  //   let selectedItems = [...this.props.selectedItems];
-  //   return selectedItems.includes(selectedValue)
-  //     ? selectedItems.filter(item => {
-  //         return item !== selectedValue;
-  //       })
-  //     : selectedItems.concat(selectedValue);
-  // };
-
   onKeyDownHandler = e => {
-    console.log(e.keyCode);
     let selectedValue = this.props.highlightedCategory;
     let filteredItems = [...this.props.filteredItems];
     let showSubLists = this.props.showSubLists;
     let highlightedValue = this.props.highlightedValue;
+    let searchInput = this.props.searchInput;
     let subLists = this.props.subLists;
     let itemIndex =
       highlightedValue === "" ? -1 : subLists.indexOf(highlightedValue);
     let index =
       selectedValue === "" ? -1 : filteredItems.indexOf(selectedValue);
-
-    if (e.keyCode === 38 && itemIndex > 0 && showSubLists) {
+    if (e.keyCode === 39 && searchInput !== "") {
+      if (selectedValue !== "") {
+        let show = showSubLists ? false : true;
+        this.props.updateSelectedItems(selectedValue, show);
+      }
+    } else if (e.keyCode === 38 && itemIndex > 0 && showSubLists) {
       this.updateViewOnScroll(itemIndex - 1);
+    } else if (e.keyCode === 38 && searchInput !== "" && index > 0) {
+      this.updateViewOnScroll(index - 1);
     } else if (e.keyCode === 38 && index > 0 && !showSubLists) {
       this.updateViewOnScroll(index - 1);
     } else if (
@@ -121,13 +89,18 @@ class Input extends PureComponent {
       this.updateViewOnScroll(itemIndex + 1);
     } else if (
       e.keyCode === 40 &&
+      searchInput !== "" &&
+      index < filteredItems.length - 1
+    ) {
+      this.updateViewOnScroll(index + 1);
+    } else if (
+      e.keyCode === 40 &&
       index < filteredItems.length - 1 &&
       !showSubLists
     ) {
       this.updateViewOnScroll(index + 1);
     } else if ((e.keyCode === 13 && !showSubLists) || e.keyCode === 39) {
       if (selectedValue !== "") {
-        // let newSelectedItems = this.getNewSelectedItemList(selectedValue);
         let show = showSubLists ? false : true;
         this.props.updateSelectedItems(selectedValue, show);
       }
